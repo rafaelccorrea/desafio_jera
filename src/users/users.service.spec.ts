@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../database/entities/user.entity';
-import { UserRepository } from '../database/repositories/user.repositorie';
+import { UserRepository } from '../database/repositories/user.repository';
 
 describe('UsersService', () => {
   let service: UsersService;

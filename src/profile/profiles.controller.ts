@@ -32,8 +32,11 @@ export class ProfilesController {
   })
   @ApiResponse({ status: 400, description: 'Requisição Inválida.' })
   @UseGuards(JwtAuthGuard)
-  async create(@Body() createProfileDto: CreateProfileDto): Promise<Profile> {
-    return this.profilesService.createProfile(createProfileDto);
+  async create(
+    @Request() req,
+    @Body() createProfileDto: CreateProfileDto,
+  ): Promise<void> {
+    return this.profilesService.createProfile(createProfileDto, req.user.id);
   }
 
   @Get('/me')
@@ -46,7 +49,6 @@ export class ProfilesController {
   @ApiResponse({ status: 404, description: 'Não Encontrado.' })
   @UseGuards(JwtAuthGuard)
   async findAllByUserId(@Request() req): Promise<Profile[]> {
-    const userId = req.user.id;
-    return this.profilesService.findAllProfilesByUserId(userId);
+    return this.profilesService.findAllProfilesByUserId(req.user.id);
   }
 }

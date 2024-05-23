@@ -32,7 +32,6 @@ describe('ProfilesService', () => {
     it('should create a new profile', async () => {
       const createProfileDto: CreateProfileDto = {
         name: 'Profile 1',
-        userId: 1,
       };
 
       const profile = {

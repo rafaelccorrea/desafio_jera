@@ -6,6 +6,4 @@ export class CreateProfileDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  userId: number;
 }
