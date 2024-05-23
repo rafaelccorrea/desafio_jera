@@ -1,35 +1,61 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  ValidationPipe,
+  UsePipes,
+  HttpStatus,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { User } from '../database/entities/user.entity';
+import { JwtAuthGuard } from '~/auth/guard/jwt-auth.guard';
 
-@ApiTags('users')
-@Controller('users')
+@ApiTags('Usuários')
+@ApiBearerAuth()
+@Controller('usuários')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create user' })
+  @ApiOperation({ summary: 'Criar usuário' })
   @ApiResponse({
-    status: 201,
-    description: 'The user has been successfully created.',
-    type: User,
+    status: HttpStatus.CREATED,
+    description: 'O usuário foi criado com sucesso.',
   })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Usuário já existe.',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Requisição Inválida.',
+  })
+  @UsePipes(ValidationPipe)
+  async create(@Body() createUserDto: CreateUserDto): Promise<void> {
     return this.usersService.createUser(createUserDto);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get user by ID' })
+  @Get('/me')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Obter usuário pelo ID' })
   @ApiResponse({
     status: 200,
-    description: 'The user has been successfully retrieved.',
+    description: 'O usuário foi recuperado com sucesso.',
     type: User,
   })
-  @ApiResponse({ status: 404, description: 'Not Found.' })
-  async findById(@Param('id') id: number): Promise<User> {
-    return this.usersService.findById(id);
+  @ApiResponse({ status: 404, description: 'Não Encontrado.' })
+  async findById(@Request() req): Promise<User> {
+    const userId = req.user.id;
+    return this.usersService.findById(userId);
   }
 }

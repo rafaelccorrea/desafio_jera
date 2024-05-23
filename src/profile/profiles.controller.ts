@@ -1,35 +1,52 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Profile } from '../database/entities/profile.entity';
 import { CreateProfileDto } from './dto/create-profile.dto';
+import { JwtAuthGuard } from '~/auth/guard/jwt-auth.guard';
 
-@ApiTags('profiles')
-@Controller('profiles')
+@ApiTags('Perfils')
+@ApiBearerAuth()
+@Controller('perfils')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create profile' })
+  @ApiOperation({ summary: 'Criar perfil' })
   @ApiResponse({
     status: 201,
-    description: 'The profile has been successfully created.',
+    description: 'O perfil foi criado com sucesso.',
     type: Profile,
   })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 400, description: 'Requisição Inválida.' })
+  @UseGuards(JwtAuthGuard)
   async create(@Body() createProfileDto: CreateProfileDto): Promise<Profile> {
     return this.profilesService.createProfile(createProfileDto);
   }
 
-  @Get('user/:userId')
-  @ApiOperation({ summary: 'Get profiles by user ID' })
+  @Get('/me')
+  @ApiOperation({ summary: 'Obter perfis pelo ID do usuário' })
   @ApiResponse({
     status: 200,
-    description: 'The profiles have been successfully retrieved.',
+    description: 'Os perfis foram recuperados com sucesso.',
     type: [Profile],
   })
-  @ApiResponse({ status: 404, description: 'Not Found.' })
-  async findAllByUserId(@Param('userId') userId: number): Promise<Profile[]> {
+  @ApiResponse({ status: 404, description: 'Não Encontrado.' })
+  @UseGuards(JwtAuthGuard)
+  async findAllByUserId(@Request() req): Promise<Profile[]> {
+    const userId = req.user.id;
     return this.profilesService.findAllProfilesByUserId(userId);
   }
 }
