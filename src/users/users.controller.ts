@@ -21,8 +21,7 @@ import { User } from '../database/entities/user.entity';
 import { JwtAuthGuard } from '~/auth/guard/jwt-auth.guard';
 
 @ApiTags('Usuários')
-@ApiBearerAuth()
-@Controller('usuários')
+@Controller('usuarios')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -47,6 +46,7 @@ export class UsersController {
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obter usuário pelo ID' })
   @ApiResponse({
     status: 200,

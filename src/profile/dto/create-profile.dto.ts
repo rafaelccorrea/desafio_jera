@@ -7,10 +7,5 @@ export class CreateProfileDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({
-    example: 123,
-    description: 'User ID associated with the profile',
-  })
-  @IsNotEmpty()
   userId: number;
 }
