@@ -6,12 +6,12 @@ dotenv.config();
 export const config: DataSourceOptions = {
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  entities: [path.resolve(__dirname, '../database/entities/*.entity{.ts,.js}')],
+  entities: [path.resolve(__dirname, './database/entities/*.entity{.ts,.js}')],
   synchronize: false,
   migrationsRun: false,
   logging: false,
   logger: 'advanced-console',
-  migrations: [path.resolve(__dirname, '../database/migrations/*{.ts,.js}')],
+  migrations: [path.resolve(__dirname, './database/migrations/*{.ts,.js}')],
 };
 
 export const configs = new DataSource(config);
