@@ -42,7 +42,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         password: 'password123',
         name: 'Test User',
-        birthDate: new Date(),
+        birthDate: '11/03/1998',
       };
 
       const hashedPassword = await bcrypt.hash(registerUserDto.password, 10);
@@ -66,7 +66,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         password: await bcrypt.hash('password123', 10),
         name: 'Test User',
-        birthDate: new Date(),
+        birthDate: '11/03/1998',
         profiles: [],
       };
 
@@ -93,7 +93,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
         password: await bcrypt.hash('password123', 10),
         name: 'Test User',
-        birthDate: new Date(),
+        birthDate: '11/03/1998',
         profiles: [],
       };
 

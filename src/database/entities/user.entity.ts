@@ -16,7 +16,7 @@ export class User {
   name: string;
 
   @Column()
-  birthDate: Date;
+  birthDate: string;
 
   @OneToMany(() => Profile, (profile) => profile.user)
   profiles: Profile[];

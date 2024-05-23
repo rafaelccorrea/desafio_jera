@@ -34,7 +34,7 @@ describe('UsersService', () => {
         email: 'test@example.com',
         password: 'password123',
         name: 'Test User',
-        birthDate: new Date(),
+        birthDate: '11/03/1998',
       };
 
       const user = {
