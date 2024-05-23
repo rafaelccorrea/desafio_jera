@@ -8,22 +8,23 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
+  @ApiProperty({ example: 'example@email.com', description: 'Email address' })
   @IsEmail()
   @IsNotEmpty()
-  @ApiProperty()
   email: string;
 
+  @ApiProperty({ minLength: 6, description: 'User password' })
   @IsString()
   @MinLength(6)
-  @ApiProperty()
   password: string;
 
+  @ApiProperty({ example: 'John Doe', description: 'User name' })
   @IsString()
   @IsNotEmpty()
-  @ApiProperty()
   name: string;
 
+  @ApiProperty({ example: '2000-01-01', description: 'User birth date' })
   @IsDate()
-  @ApiProperty()
+  @IsNotEmpty()
   birthDate: Date;
 }
