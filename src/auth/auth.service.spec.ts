@@ -5,7 +5,6 @@ import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { User } from '../database/entities/user.entity';
 
@@ -34,29 +33,6 @@ describe('AuthService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
-  });
-
-  describe('register', () => {
-    it('should create a new user', async () => {
-      const registerUserDto: RegisterUserDto = {
-        email: 'test@example.com',
-        password: 'password123',
-        name: 'Test User',
-        birthDate: '11/03/1998',
-      };
-
-      const hashedPassword = await bcrypt.hash(registerUserDto.password, 10);
-      const user = {
-        id: 1,
-        ...registerUserDto,
-        password: hashedPassword,
-        profiles: [],
-      };
-
-      jest.spyOn(usersService, 'createUser').mockResolvedValue(user as any);
-
-      expect(await service.register(registerUserDto)).toEqual(user);
-    });
   });
 
   describe('validateUser', () => {

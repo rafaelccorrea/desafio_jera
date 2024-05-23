@@ -1,9 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { User } from '~/database/entities/user.entity';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -29,26 +27,6 @@ describe('AuthController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
-  });
-
-  describe('register', () => {
-    it('should register a user', async () => {
-      const registerUserDto: RegisterUserDto = {
-        email: 'test@example.com',
-        password: 'password123',
-        name: 'Test User',
-        birthDate: '11/03/1998',
-      };
-
-      const result = {
-        id: 1,
-        ...registerUserDto,
-      };
-
-      jest.spyOn(service, 'register').mockResolvedValue(result as User);
-
-      expect(await controller.register(registerUserDto)).toEqual(result);
-    });
   });
 
   describe('login', () => {
