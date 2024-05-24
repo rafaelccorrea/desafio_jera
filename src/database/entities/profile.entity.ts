@@ -21,7 +21,7 @@ export class Profile {
   user: User;
 
   @ManyToMany(() => Movie, (movie) => movie.profiles, { cascade: true })
-  @JoinTable({ name: 'profile_movies_movie' })
+  @JoinTable({ name: 'profile_movie' })
   movies: Movie[];
 
   @Column({ default: false })

@@ -8,7 +8,7 @@ import { UserRepository } from '../database/repositories/user.repository';
 import { Movie } from '../database/entities/movie.entity';
 import { MovieRepository } from '../database/repositories/movie.repository';
 import { AddMovieDto } from './dto/profile-movie.dto';
-import { runInTransaction } from '~/helpers/runTransaction';
+import { runInTransaction } from '../helpers/runTransaction';
 import { Connection } from 'typeorm';
 import { MAX_PROFILES_PER_USER_NUMBER } from '~/constants/maxProfilesPerUser';
 

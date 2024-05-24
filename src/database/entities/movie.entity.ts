@@ -19,6 +19,6 @@ export class Movie {
   title: string;
 
   @ManyToMany(() => Profile, (profile) => profile.movies)
-  @JoinTable({ name: 'profile_movies_movie' })
+  @JoinTable({ name: 'profile_movie' })
   profiles: Profile[];
 }
