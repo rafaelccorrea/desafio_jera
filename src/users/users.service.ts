@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../database/entities/user.entity';
@@ -8,49 +8,70 @@ import { UserRepository } from '../database/repositories/user.repository';
 import { ProfileRepository } from '../database/repositories/profile.repository';
 import { runInTransaction } from '../helpers/runTransaction';
 import { Connection } from 'typeorm';
+import { PROVIDER_AUTH_LOGIN } from './types/provider.auth.login';
+import { UserProfile } from './types/user.profile';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: UserRepository,
+    @InjectRepository(User) private readonly usersService: UserRepository,
     @InjectRepository(Profile)
     private readonly profileRepository: ProfileRepository,
     private readonly connection: Connection,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<void> {
-    await runInTransaction(async () => {
-      const existingUser = await this.userRepository.findOne({
-        where: { email: createUserDto.email },
-      });
+  async createOrUpdateUser(profile: UserProfile): Promise<User> {
+    let user = await this.usersService.findOne({
+      where: { email: profile.email },
+    });
 
-      if (existingUser) {
-        throw new ConflictException('User already exists');
+    if (!user) {
+      const userData: CreateUserDto = {
+        email: profile.email,
+        name: profile.name,
+        password: profile.password || '',
+        birthDate: profile.birthDate || '',
+      };
+
+      if (profile.password) {
+        userData.password = await bcrypt.hash(profile.password, 10);
       }
 
-      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+      user = this.usersService.create(userData);
+      user.provider = profile.provider;
 
-      const user = this.userRepository.create({
-        email: createUserDto.email,
-        password: hashedPassword,
-        name: createUserDto.name,
-        birthDate: createUserDto.birthDate,
-      });
+      if (profile.facebookId) {
+        user.facebookId = profile.facebookId;
+      }
 
-      await this.userRepository.save(user);
+      await this.usersService.save(user);
 
-      const profile = this.profileRepository.create({
-        name: createUserDto.name,
+      const profileData = this.profileRepository.create({
+        name: profile.name,
         user: user,
         isPrimary: true,
       });
 
-      await this.profileRepository.save(profile);
+      await this.profileRepository.save(profileData);
+    }
+
+    return user;
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<void> {
+    await runInTransaction(async () => {
+      await this.createOrUpdateUser({
+        email: createUserDto.email,
+        name: createUserDto.name,
+        password: createUserDto.password,
+        birthDate: createUserDto.birthDate,
+        provider: PROVIDER_AUTH_LOGIN.SYSTEM,
+      });
     }, this.connection);
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({
+    return await this.usersService.findOne({
       where: { email },
       relations: {
         profiles: true,
@@ -59,7 +80,7 @@ export class UsersService {
   }
 
   async findById(id: number): Promise<User> {
-    return await this.userRepository.findOne({
+    return await this.usersService.findOne({
       where: { id },
       relations: ['profiles'],
     });

@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './guard/jwt.strategy';
 import { LocalStrategy } from './guard/local.strategy';
+import { FacebookStrategy } from './guard/facebook.strategy';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { LocalStrategy } from './guard/local.strategy';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, FacebookStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
