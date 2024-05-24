@@ -10,6 +10,7 @@ import { MovieRepository } from '../database/repositories/movie.repository';
 import { AddMovieDto } from './dto/profile-movie.dto';
 import { runInTransaction } from '~/helpers/runTransaction';
 import { Connection } from 'typeorm';
+import { MAX_PROFILES_PER_USER_NUMBER } from '~/constants/maxProfilesPerUser';
 
 @Injectable()
 export class ProfilesService {
@@ -24,7 +25,7 @@ export class ProfilesService {
   async createProfile(
     createProfileDto: CreateProfileDto,
     userId: number,
-    maxProfilesPerUser: number = 4,
+    maxProfilesPerUser: number = MAX_PROFILES_PER_USER_NUMBER,
   ): Promise<void> {
     await runInTransaction(async () => {
       await this.validateUser(userId);
