@@ -2,8 +2,10 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../database/entities/user.entity';
+import { Profile } from '../database/entities/profile.entity';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../database/repositories/user.repository';
+import { ProfileRepository } from '../database/repositories/profile.repository';
 import { runInTransaction } from '../helpers/runTransaction';
 import { Connection } from 'typeorm';
 
@@ -11,6 +13,8 @@ import { Connection } from 'typeorm';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: UserRepository,
+    @InjectRepository(Profile)
+    private readonly profileRepository: ProfileRepository,
     private readonly connection: Connection,
   ) {}
 
@@ -32,12 +36,26 @@ export class UsersService {
         name: createUserDto.name,
         birthDate: createUserDto.birthDate,
       });
+
       await this.userRepository.save(user);
+
+      const profile = this.profileRepository.create({
+        name: createUserDto.name,
+        user: user,
+        isPrimary: true,
+      });
+
+      await this.profileRepository.save(profile);
     }, this.connection);
   }
 
   async findByEmail(email: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({ where: { email } });
+    return await this.userRepository.findOne({
+      where: { email },
+      relations: {
+        profiles: true,
+      },
+    });
   }
 
   async findById(id: number): Promise<User> {

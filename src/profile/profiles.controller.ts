@@ -5,6 +5,7 @@ import {
   Get,
   Request,
   UseGuards,
+  Param,
 } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import {
@@ -16,6 +17,7 @@ import {
 import { Profile } from '../database/entities/profile.entity';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { JwtAuthGuard } from '~/auth/guard/jwt-auth.guard';
+import { AddMovieDto } from './dto/profile-movie.dto';
 
 @ApiTags('Perfils')
 @ApiBearerAuth()
@@ -50,5 +52,20 @@ export class ProfilesController {
   @UseGuards(JwtAuthGuard)
   async findAllByUserId(@Request() req): Promise<Profile[]> {
     return this.profilesService.findAllProfilesByUserId(req.user.id);
+  }
+
+  @Post(':profileId/movies')
+  @ApiOperation({ summary: 'Adicionar filme ao perfil' })
+  @ApiResponse({
+    status: 200,
+    description: 'O filme foi adicionado ao perfil com sucesso.',
+    type: Profile,
+  })
+  @ApiResponse({ status: 400, description: 'Requisição Inválida.' })
+  async addMovieToProfile(
+    @Param('profileId') profileId: number,
+    @Body() movieData: AddMovieDto,
+  ): Promise<Profile> {
+    return this.profilesService.addMovieToProfile(profileId, movieData);
   }
 }

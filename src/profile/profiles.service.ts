@@ -5,6 +5,11 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { User } from '../database/entities/user.entity';
 import { ProfileRepository } from '../database/repositories/profile.repository';
 import { UserRepository } from '../database/repositories/user.repository';
+import { Movie } from '../database/entities/movie.entity';
+import { MovieRepository } from '../database/repositories/movie.repository';
+import { AddMovieDto } from './dto/profile-movie.dto';
+import { runInTransaction } from '~/helpers/runTransaction';
+import { Connection } from 'typeorm';
 
 @Injectable()
 export class ProfilesService {
@@ -12,6 +17,8 @@ export class ProfilesService {
     @InjectRepository(Profile)
     private readonly profileRepository: ProfileRepository,
     @InjectRepository(User) private readonly userRepository: UserRepository,
+    @InjectRepository(Movie) private movieRepository: MovieRepository,
+    private readonly connection: Connection,
   ) {}
 
   async createProfile(
@@ -19,16 +26,18 @@ export class ProfilesService {
     userId: number,
     maxProfilesPerUser: number = 4,
   ): Promise<void> {
-    await this.validateUser(userId);
-    await this.validateProfileLimit(userId, maxProfilesPerUser);
-    await this.validateProfileName(createProfileDto.name, userId);
+    await runInTransaction(async () => {
+      await this.validateUser(userId);
+      await this.validateProfileLimit(userId, maxProfilesPerUser);
+      await this.validateProfileName(createProfileDto.name, userId);
 
-    const profile = this.profileRepository.create({
-      ...createProfileDto,
-      user: { id: userId },
-    });
+      const profile = this.profileRepository.create({
+        ...createProfileDto,
+        user: { id: userId },
+      });
 
-    await this.profileRepository.save(profile);
+      await this.profileRepository.save(profile);
+    }, this.connection);
   }
 
   async findAllProfilesByUserId(userId: number): Promise<Profile[]> {
@@ -77,5 +86,28 @@ export class ProfilesService {
         `O usuário atingiu o limite máximo de ${maxProfilesPerUser} perfis`,
       );
     }
+  }
+
+  async addMovieToProfile(
+    profileId: number,
+    movieData: AddMovieDto,
+  ): Promise<Profile> {
+    return runInTransaction(async () => {
+      const profile = await this.profileRepository.findOne({
+        where: { id: profileId },
+        relations: ['movies'],
+      });
+      let movie = await this.movieRepository.findOne({
+        where: { external_id: movieData.external_id },
+      });
+
+      if (!movie) {
+        movie = this.movieRepository.create(movieData);
+        await this.movieRepository.save(movie);
+      }
+
+      profile.movies.push(movie);
+      return this.profileRepository.save(profile);
+    }, this.connection);
   }
 }
