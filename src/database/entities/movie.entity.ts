@@ -18,6 +18,9 @@ export class Movie {
   @Column()
   title: string;
 
+  @Column()
+  category: string;
+
   @ManyToMany(() => Profile, (profile) => profile.movies)
   @JoinTable({ name: 'profile_movie' })
   profiles: Profile[];
