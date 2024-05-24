@@ -107,8 +107,16 @@ export class ProfilesService {
         await this.movieRepository.save(movie);
       }
 
+      if (this.movieAlreadyInProfile(profile, movie)) {
+        throw new BadRequestException('Este filme já está na lista do perfil');
+      }
+
       profile.movies.push(movie);
       return this.profileRepository.save(profile);
     }, this.connection);
+  }
+
+  private movieAlreadyInProfile(profile: Profile, movie: Movie): boolean {
+    return profile.movies.some((m) => m.external_id === movie.external_id);
   }
 }
