@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { runInTransaction } from '../helpers/runTransaction';
@@ -18,7 +22,7 @@ export class MoviesService {
       const profileMovie = await this.profileMoviesMovieRepository.findOne({
         where: {
           profile: { id: profileId },
-          movie: { id: movieId },
+          movie: { external_id: movieId },
         },
       });
 
@@ -30,5 +34,40 @@ export class MoviesService {
 
       await this.profileMoviesMovieRepository.save(profileMovie);
     }, this.connection);
+  }
+
+  private async validateProfile(userId: number, profileId: number) {
+    const profile = await this.profileMoviesMovieRepository.findOne({
+      where: {
+        profile: {
+          id: profileId,
+          user: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    if (!profile) {
+      throw new UnauthorizedException(
+        'Você não tem permissão para acessar este perfil.',
+      );
+    }
+  }
+
+  async movieListProfile(userId: number, profileId: number): Promise<any[]> {
+    await this.validateProfile(userId, profileId);
+
+    const movies = await this.profileMoviesMovieRepository.find({
+      relations: ['movie'],
+      where: {
+        profile: { id: profileId },
+      },
+    });
+
+    return movies.map((profileMovie) => ({
+      movie: profileMovie.movie,
+      watched: profileMovie.watched,
+    }));
   }
 }
