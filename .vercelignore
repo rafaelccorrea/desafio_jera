@@ -1,0 +1,2 @@
+# .vercelignore
+!src/database/entities/
