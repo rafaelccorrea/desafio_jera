@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../database/entities/user.entity';
@@ -24,6 +24,10 @@ export class UsersService {
     let user = await this.usersService.findOne({
       where: { email: profile.email },
     });
+
+    if (user && user.provider === PROVIDER_AUTH_LOGIN.SYSTEM) {
+      throw new ConflictException('Usuário já existe.');
+    }
 
     if (!user) {
       const userData: CreateUserDto = {
