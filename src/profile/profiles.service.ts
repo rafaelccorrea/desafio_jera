@@ -98,6 +98,14 @@ export class ProfilesService {
         where: { id: profileId },
         relations: ['movies'],
       });
+
+      const movieExists = profile.movies.some(
+        (movie) => movie.external_id === movieData.external_id,
+      );
+      if (movieExists) {
+        throw new Error('O filme já foi adicionado ao perfil.');
+      }
+
       let movie = await this.movieRepository.findOne({
         where: { external_id: movieData.external_id },
       });
