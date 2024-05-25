@@ -15,8 +15,8 @@ import {
 } from '@nestjs/swagger';
 import { Movie } from '../database/entities/movie.entity';
 import { MoviesService } from './movies.service';
-import { JwtAuthGuard } from '~/auth/guard/jwt-auth.guard';
-import { ProfileMovie } from '~/database/entities/profile-movie.entity';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { ProfileMovie } from '../database/entities/profile-movie.entity';
 
 @ApiTags('Filmes')
 @ApiBearerAuth()

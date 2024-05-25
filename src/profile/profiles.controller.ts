@@ -16,7 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { Profile } from '../database/entities/profile.entity';
 import { CreateProfileDto } from './dto/create-profile.dto';
-import { JwtAuthGuard } from '~/auth/guard/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { AddMovieDto } from './dto/profile-movie.dto';
 
 @ApiTags('Perfils')
