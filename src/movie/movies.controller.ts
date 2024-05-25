@@ -20,7 +20,7 @@ import { ProfileMovie } from '~/database/entities/profile-movie.entity';
 
 @ApiTags('Filmes')
 @ApiBearerAuth()
-@Controller('filmes')
+@Controller('movies')
 export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
@@ -41,7 +41,7 @@ export class MoviesController {
     await this.moviesService.markMovieAsWatched(profileId, movieId);
   }
 
-  @Get('/meus-filmes/:profileId')
+  @Get('/me/:profileId')
   @ApiOperation({ summary: 'Obter filmes pelo ID do perfil' })
   @ApiResponse({
     status: 200,

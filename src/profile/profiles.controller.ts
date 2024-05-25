@@ -21,7 +21,7 @@ import { AddMovieDto } from './dto/profile-movie.dto';
 
 @ApiTags('Perfils')
 @ApiBearerAuth()
-@Controller('perfils')
+@Controller('profile')
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
 

@@ -21,11 +21,11 @@ import { User } from '../database/entities/user.entity';
 import { JwtAuthGuard } from '~/auth/guard/jwt-auth.guard';
 
 @ApiTags('Usuários')
-@Controller('usuarios')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('/create')
   @ApiOperation({ summary: 'Criar usuário' })
   @ApiResponse({
     status: HttpStatus.CREATED,
