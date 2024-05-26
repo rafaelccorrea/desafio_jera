@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-facebook';
+import { Strategy, Profile } from 'passport-facebook';
 import { AuthService } from '../auth.service';
-import { Profile } from 'passport-facebook';
 
 @Injectable()
 export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
@@ -16,13 +15,14 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
   }
 
   async validate(
+    accessToken: string,
+    refreshToken: string,
     profile: Profile,
-    done: (err: any, user?: any, info?: any) => void,
-  ) {
+  ): Promise<any> {
     const { id, emails, name } = profile;
     if (!emails || emails.length === 0) {
-      return done(
-        new Error('O perfil do Facebook não fornece um endereço de e-mail.'),
+      throw new Error(
+        'O perfil do Facebook não fornece um endereço de e-mail.',
       );
     }
 
@@ -33,6 +33,6 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       lastName: name.familyName,
     });
 
-    done(null, user);
+    return user;
   }
 }
