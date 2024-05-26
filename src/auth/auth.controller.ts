@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  Get,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import {
@@ -43,9 +35,7 @@ export class AuthController {
   })
   @Get('facebook/callback')
   @UseGuards(FacebookAuthGuard)
-  async facebookLoginCallback(@Req() req, @Res() res) {
-    const { accessToken, redirectTo } =
-      await this.authService.loginWithFacebook(req.user);
-    res.redirect(`${redirectTo}?accessToken=${accessToken}`);
+  async facebookLoginCallback(@Req() req): Promise<{ accessToken: string }> {
+    return this.authService.loginWithFacebook(req.user);
   }
 }
