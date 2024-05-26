@@ -51,12 +51,17 @@ export class AuthService {
     });
   }
 
-  async loginWithFacebook(user: User): Promise<{ accessToken: string }> {
+  async loginWithFacebook(
+    user: User,
+  ): Promise<{ accessToken: string; redirectTo: string }> {
     const payload = {
       email: user.email,
       id: user.id,
       profiles: user.profiles,
     };
-    return { accessToken: this.jwtService.sign(payload) };
+    return {
+      accessToken: this.jwtService.sign(payload),
+      redirectTo: 'https://desafio-jera.vercel.app/auth/facebook/ok',
+    };
   }
 }

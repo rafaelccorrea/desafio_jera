@@ -15,25 +15,29 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     });
   }
 
-  async validate(
-    accessToken: string,
-    refreshToken: string,
-    profile: Profile,
-  ): Promise<any> {
-    const { id, emails, name } = profile;
-    if (!emails || emails.length === 0) {
-      throw new Error(
-        'O perfil do Facebook não fornece um endereço de e-mail.',
-      );
+  async validate(profile: Profile): Promise<any> {
+    try {
+      const { id, emails, name } = profile;
+
+      if (!id) {
+        throw new Error('O perfil do Facebook não fornece um ID válido.');
+      }
+
+      const email = emails?.[0]?.value || null;
+
+      const user = await this.authService.validateFacebookUser({
+        facebookId: id,
+        email: email,
+        firstName: name.givenName || '',
+        lastName: name.familyName || '',
+      });
+
+      console.log('Usuário autenticado com sucesso:', user);
+
+      return user;
+    } catch (error) {
+      console.error('Erro ao autenticar usuário do Facebook:', error);
+      throw error;
     }
-
-    const user = await this.authService.validateFacebookUser({
-      facebookId: id,
-      email: emails[0].value,
-      firstName: name.givenName,
-      lastName: name.familyName,
-    });
-
-    return user;
   }
 }
