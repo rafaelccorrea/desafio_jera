@@ -48,3 +48,10 @@ Para iniciar o servidor de desenvolvimento, execute o comando:
 ```bash
 yarn dev
 ```
+
+### Documentação da API
+A documentação da API está disponível no Swagger e pode ser acessada através da URL:
+
+```bash
+http://localhost:3000/api#
+```
